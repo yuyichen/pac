@@ -5769,27 +5769,23 @@ function n2CoverCode(n) {
 /**
  *
  */
-function checkIpInChina(ip) {
-  return false
+function checkHostInChina(host) {
+  if(!isResolvable(host)){//域名不可解析时
+     return false
+  }
   for (var i = 0, len = china_ips.length; i < len; i++) {
     var x = china_ips[i];
     var ipRange = x.split("/")[0];
     var n = x.split("/")[1];
     var coverCode = n2CoverCode(n);
-    if (isInNet(ip, ipRange, coverCode)) {
+    if (isInNet(host, ipRange, coverCode)) {
       return true;
     }
   }
   return false;
 }
 function FindProxyForURL(url, host) {
-  alert(host);
-  if (isPlainHostName(host) === true || exlude_domain.indexOf(host) > -1) {
-    return "DIRECT;";
-  }
-  var strIp = dnsResolve(host);
-
-  if (strIp && checkIpInChina(strIp)) {
+  if (isPlainHostName(host) || exlude_domain.indexOf(host) > -1 || checkHostInChina(host)) {
     return "DIRECT;";
   }
 
