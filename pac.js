@@ -5750,6 +5750,7 @@ var china_ips = [
   "223.255.252.0/23"
 ];
 
+var 
 /**
  * n转换成掩码
  */
@@ -5766,26 +5767,50 @@ function n2CoverCode(n) {
   return ip;
 }
 
+function ip2long(ip) {
+  var ipl=0;
+  ip.split('.').forEach(function( octet ) {
+      ipl<<=8;
+      ipl+=parseInt(octet);
+  });
+  return(ipl >>>0);
+}
+
+function checkIpInRange(ip,startIp,coverNumer){
+  var ipInt = ip2long(ip);
+  var startIpInt = ip2long(startIp);
+  return ipInt > startIpInt && ipInt < (startIpInt + ((1 << 32) - (1 << coverNumer) - 1))
+}
+
+var cacheResult = {};
 /**
- *
+ *检查是否是国内域名,isInNet(dnsResolve(host), ipRange, coverCode),不知道为啥效果
  */
 function checkHostInChina(host) {
-  if(!isResolvable(host)){//域名不可解析时
-     return false
+  if(host in cacheResult){
+    return cacheResult[host]
   }
   for (var i = 0, len = china_ips.length; i < len; i++) {
     var x = china_ips[i];
-    var ipRange = x.split("/")[0];
-    var n = x.split("/")[1];
+    var arr = x.split("/");
+    var ipRange = arr[0];
+    var n = arr[1];
     var coverCode = n2CoverCode(n);
-    if (isInNet(host, ipRange, coverCode)) {
+    if (isInNet(dnsResolve(host), ipRange, coverCode)) {
+      cacheResult[host] = true;
       return true;
     }
   }
+  cacheResult[host] = false;
   return false;
 }
 function FindProxyForURL(url, host) {
-  if (isPlainHostName(host) || exlude_domain.indexOf(host) > -1 || checkHostInChina(host)) {
+  if (
+    isPlainHostName(host) ||
+    exlude_domain.indexOf(host) > -1 ||
+    !isResolvable(host) ||
+    checkHostInChina(host)
+  ) {
     return "DIRECT;";
   }
 
