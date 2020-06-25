@@ -4,7 +4,7 @@
  * 国内ip参考
  * https://github.com/17mon/china_ip_list
  */
-var wall_proxy = "HTTPS default.px.skyzip.de:443;"; //翻墙代理
+var wall_proxy = "HTTPS usa.cn-cloudflare.com:443;"; //翻墙代理
 var google_proxy = {
   y: "SOCKS5 y.kuomu.xyz:1443;SOCKS5 123.125.115.110:1443;",
   b: "SOCKS5 b.kuomu.xyz:1443;SOCKS5 144.202.99.26:1443;",
